@@ -1,0 +1,383 @@
+---
+title: "Hsp90 stress and the Candida albicans genome"
+output:
+ #tufte::tufte_html: default
+  tufte::tufte_handout: default
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+rm(list=ls())
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(RColorBrewer)
+library(grid)
+library(MASS)
+library(tufte)
+source("~/Dropbox/! Diezmann Lab/R/FormatGGplot.R")
+```
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.height=4, dev.args = list(bg = 'transparent'),
+                      echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+
+* * * 
+
+##Summary of results
+
+1. Increasing concentrations of the Hsp90 inhibitors Geldanamycin (GdA) and Radicicol (RAD) result in increased LoH rates
+2. Perturbing Hsp90 levels by high temperature or Hsp90 inhibtor treatment results in increased LoH rates across the genome
+3. 
+
+
+* * * 
+
+#Hsp90 inhibitor dose response
+
+`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
+`r margin_note("- Strain used MYO1/MYO1::URA3, marking chromosome 5L ")`
+`r margin_note("- subsequent experiments were conducted with 3 µM GdA or RAD as they were also the highest doses possible before cell shape changed influencing the CFU assay")`
+
+```{r }
+GdA.RAD.dose <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/GdA RAD dose.txt")
+dodge <- position_dodge(width=0.6)
+ggplot(GdA.RAD.dose, aes(y=Rate, x=Conc, fill=Inhibitor)) +
+  geom_bar(stat='identity', position=dodge, width=0.6) +
+  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.25) +
+  #ggtitle('Hsp90 inhibitor dose response') +
+  pdf_theme() +
+  theme(legend.position='top') +
+  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2)]) +
+  ylab("LoH rate/cell division") +
+  xlab("Inhibitor concentration (µM)")
+```
+
+
+
+#Temperature and Hsp90 inhibition synergistically increase LoH
+
+`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
+`r margin_note("- Strain used MYO1/MYO1::URA3, marking chromosome 5L ")`
+
+```{r}
+Comparison <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/Comparison2.txt")
+dodge <- position_dodge(width=0.6)
+Comparison$Treatment <- relevel(Comparison$Treatment, ref = 'None')
+ggplot(Comparison, aes(y=Rate, x=Temperature, fill=Temperature)) +
+  geom_bar(stat='identity', position=dodge, width=0.6) +
+  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.25) +
+  #ggtitle('LoH rates at the MYO1 (Chr 5L) locus in different conditions') +
+  facet_grid(. ~ Treatment) +
+  pdf_theme() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  theme(legend.position='bottom') +
+  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2,4)]) +
+  ylab("LoH rate/cell division") +
+  xlab("Condition")
+```
+
+
+
+#Genome-wide LoH rates are affected by temperature and pharmacological inhibition of Hsp90
+
+##Genome-wide LoH rates at 30C and 37C
+
+`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
+`r margin_note("- p-value = 8.227e-05")`
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
+Genome$Locus <- factor(Genome$Locus, levels=c("GAL1", "PHO85", "HCM1", "AXL2",  "TUB4",  "MYO1", "BUD7",  "SAP5",  "LIP4"))
+dodge <- position_dodge(width=0.75)
+ggplot(subset(Genome, Treatment == '30C' | Treatment == '37C'), aes(y=Rate, x=Locus, fill=Treatment)) +
+  geom_bar(stat='identity', position=dodge, width=0.75)+
+  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.375) +
+  #ggtitle('Genome-wide LoH rates at 37C') +
+  pdf_theme() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  theme(legend.position='top') +
+  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2)]) +
+  ylab("LoH rate/cell division") +
+  xlab("Genomic locus")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_37C.txt")
+wilcox.test(WSR$X30C, WSR$X37C)
+```
+
+
+##Genome-wide LoH rates at 30C and 39C
+
+`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
+`r margin_note("- p-value = 8.227e-05")`
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
+Genome$Locus <- factor(Genome$Locus, levels=c("GAL1", "PHO85", "HCM1", "AXL2",  "TUB4",  "MYO1", "BUD7",  "SAP5",  "LIP4"))
+dodge <- position_dodge(width=0.75)
+ggplot(subset(Genome, Treatment == '30C' | Treatment == '39C'), aes(y=Rate, x=Locus, fill=Treatment)) +
+  geom_bar(stat='identity', position=dodge, width=0.75)+
+  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.375) +
+  #ggtitle('Genome-wide LoH rates at 39C') +
+  pdf_theme() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  theme(legend.position='top') +
+  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2)]) +
+  ylab("LoH rate/cell division") +
+  xlab("Genomic locus")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_39C.txt")
+wilcox.test(WSR$X30C, WSR$X39C)
+```
+
+
+##Comparison of genome-wide LoH rates at 37C and 39C
+
+`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
+`r margin_note("- p-value = 0.3865")`
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
+Genome$Locus <- factor(Genome$Locus, levels=c("GAL1", "PHO85", "HCM1", "AXL2",  "TUB4",  "MYO1", "BUD7",  "SAP5",  "LIP4"))
+dodge <- position_dodge(width=0.75)
+ggplot(subset(Genome, Treatment == '37C' | Treatment == '39C'), aes(y=Rate, x=Locus, fill=Treatment)) +
+  geom_bar(stat='identity', position=dodge, width=0.75)+
+  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.375) +
+  #ggtitle('Genome-wide LoH rates at 37C and 39C') +
+  pdf_theme() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  theme(legend.position='top') +
+  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2)]) +
+  ylab("LoH rate/cell division") +
+  xlab("Genomic locus")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_37C_39C.txt")
+wilcox.test(WSR$X37C, WSR$X39C)
+```
+
+
+##Comparison of genome-wide LoH rates at 30C, 37C and 39C
+
+`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
+Genome$Locus <- factor(Genome$Locus, levels=c("GAL1", "PHO85", "HCM1", "AXL2",  "TUB4",  "MYO1", "BUD7",  "SAP5",  "LIP4"))
+dodge <- position_dodge(width=0.75)
+ggplot(subset(Genome, Treatment == '30C' | Treatment == '37C' | Treatment == '39C'), aes(y=Rate, x=Locus, fill=Treatment)) +
+  geom_bar(stat='identity', position=dodge, width=0.75)+
+  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.375) +
+  #ggtitle('Genome-wide LoH rates at 30C, 37C and 39C') +
+  pdf_theme() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  theme(legend.position='top') +
+  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2,4)]) +
+  ylab("LoH rate/cell division") +
+  xlab("Genomic locus")
+```
+
+##Genome-wide LoH rates when treated with 3 µM Geldanamycin at 30C
+
+`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
+`r margin_note("- p-value = 0.0104")`
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
+Genome$Locus <- factor(Genome$Locus, levels=c("GAL1", "PHO85", "HCM1", "AXL2",  "TUB4",  "MYO1", "BUD7",  "SAP5",  "LIP4"))
+dodge <- position_dodge(width=0.75)
+ggplot(subset(Genome, Treatment == '30C' | Treatment == 'Geldanamycin'), aes(y=Rate, x=Locus, fill=Treatment)) +
+  geom_bar(stat='identity', position=dodge, width=0.75)+
+  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.375) +
+  #ggtitle('Genome-wide LoH rates when treated with 3 µM Geldanamycin') +
+  pdf_theme() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  theme(legend.position='top') +
+  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2)]) +
+  ylab("LoH rate/cell division") +
+  xlab("Genomic locus")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_GdA.txt")
+wilcox.test(WSR$X30C, WSR$Geldanamycin)
+```
+
+
+##Genome-wide LoH rates when treated with 3 µM Radicicol at 30C
+
+`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
+`r margin_note("- p-value = 0.017")`
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
+Genome$Locus <- factor(Genome$Locus, levels=c("GAL1", "PHO85", "HCM1", "AXL2",  "TUB4",  "MYO1", "BUD7",  "SAP5",  "LIP4"))
+dodge <- position_dodge(width=0.75)
+ggplot(subset(Genome, Treatment == '30C' | Treatment == 'Radicicol'), aes(y=Rate, x=Locus, fill=Treatment)) +
+  geom_bar(stat='identity', position=dodge, width=0.75)+
+  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.375) +
+  #ggtitle('Genome-wide LoH rates when treated with 3 µM Radicicol') +
+  pdf_theme() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  theme(legend.position='top') +
+  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2)]) +
+  ylab("LoH rate/cell division") +
+  xlab("Genomic locus")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_RAD.txt")
+wilcox.test(WSR$X30C, WSR$RAD)
+```
+
+
+##Comparison of genome-wide LoH rates when treated with 3 µM Geldanamycin or Radicicol at 30C
+
+`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
+`r margin_note("- p-value = 0.9296")`
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
+Genome$Locus <- factor(Genome$Locus, levels=c("GAL1", "PHO85", "HCM1", "AXL2",  "TUB4",  "MYO1", "BUD7",  "SAP5",  "LIP4"))
+dodge <- position_dodge(width=0.75)
+ggplot(subset(Genome, Treatment == '30C' | Treatment == 'Radicicol' | Treatment == 'Geldanamycin'), aes(y=Rate, x=Locus, fill=Treatment)) +
+  geom_bar(stat='identity', position=dodge, width=0.75)+
+  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.375) +
+  #ggtitle('Genome-wide LoH rates when treated with 3 µM Radicicol or Geldanamycin at 30C') +
+  pdf_theme() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  theme(legend.position='top') +
+  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2,4)]) +
+  ylab("LoH rate/cell division") +
+  xlab("Genomic locus")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_GdA_RAD.txt")
+wilcox.test(WSR$GdA, WSR$RAD)
+```
+
+
+##Genome-wide LoH rates in the HSP90/hsp90 heterozygous strain at 30C
+
+`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
+`r margin_note("- p-value = 0.791")`
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
+Genome$Locus <- factor(Genome$Locus, levels=c("GAL1", "PHO85", "HCM1", "AXL2",  "TUB4",  "MYO1", "BUD7",  "SAP5",  "LIP4"))
+dodge <- position_dodge(width=0.75)
+ggplot(subset(Genome, Treatment == '30C' | Treatment == 'HSP90/hsp90'), aes(y=Rate, x=Locus, fill=Treatment)) +
+  geom_bar(stat='identity', position=dodge, width=0.75)+
+  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.375) +
+  #ggtitle('Genome-wide LoH rates in the HSP90/hsp90 heterozygous strain') +
+  pdf_theme() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  theme(legend.position='top') +
+  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2)]) +
+  ylab("LoH rate/cell division") +
+  xlab("Genomic locus")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_HSP90.txt")
+wilcox.test(WSR$X30C, WSR$HSP90.hsp90)
+```
+
+`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+LoHevents <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/SNP_RFLP.txt")
+ggplot(LoHevents, aes(y=Percent, x=Treatment, fill=LoH.event)) +
+  geom_bar(stat='identity', width=0.6) +
+  facet_grid(~ Locus) +
+  #geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.25) +
+  #ggtitle('LoH type and rate across the genome') +
+  theme(legend.text=element_text(size=20), legend.title=element_text(size=22)) +
+  theme(axis.text.x = element_text(size=20,angle=0,hjust=.5,vjust=.5,face="plain"),
+        axis.text.y = element_text(size=20,angle=0,hjust=1,vjust=0,face="plain"),
+        axis.title.x = element_text(margin=margin(20,0,0,0), size=22,angle=0,hjust=.5,vjust=0,face="bold"),
+        axis.title.y = element_text(margin=margin(0,10,0,0), size=22,angle=90,hjust=.5,vjust=.5,face="bold")) +
+theme(legend.position='bottom', legend.key=element_rect(size=1, color="white"), legend.key.size=unit(1, "lines")) +
+  scale_fill_manual(values=brewer.pal(12, "Set3")[c(1,11,3,5,8,10)]) +
+  guides(fill=guide_legend(nrow=2,byrow=TRUE)) +
+  ylab("Percent (%)") +
+  xlab("Condition") +
+  labs(fill="")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+HCM1_MIC<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/HCM1_MIC.txt",sep="\t",header=T)
+HCM1_MIC<-HCM1_MIC[1:20,1:6]
+HCM1_MIC<-gather(HCM1_MIC, "Hsp90_Stress", "MIC")
+AOV<-aov(MIC ~ Hsp90_Stress, data=HCM1_MIC)
+summary(AOV)
+TukeyHSD(AOV)
+ggplot(HCM1_MIC, aes(x=Hsp90_Stress, y=MIC, colour=Hsp90_Stress))+
+  geom_jitter(size=3, position = position_jitter(width = .3))+
+  ylab("MIC")+
+  xlab("")+
+  sd_theme()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12),
+        axis.text.y = element_text(size=12),
+        axis.title.y=element_text(size=14, face='bold'),
+        legend.position="none"
+        ) +
+  scale_color_manual(values=c(rep("dodgerblue2", 3),rep("lightseagreen",3)))
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
+#Genome$Locus <- factor(Genome$Locus, levels=c("GAL1", "PHO85", "HCM1", "AXL2",  "TUB4",  "MYO1", "BUD7",  "SAP5",  "LIP4"))
+#dodge <- position_dodge(width=0.75)
+#ggplot(subset(Genome, Treatment == '30C' | Treatment == '39C'), aes(y=Rate, x=Locus, fill=Treatment)) +
+#  geom_bar(stat='identity', position=dodge, width=0.75)+
+#  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.375) +
+#  #ggtitle('Genome-wide LoH rates at 39C') +
+#  sd_theme() +
+#  theme(legend.text=element_text(size=20), legend.title=element_text(size=22)) +
+#  theme(axis.text.x = element_text(size=20,angle=45,hjust=1,vjust=1,face="italic"),
+#        axis.text.y = element_text(size=20,angle=0,hjust=1,vjust=0,face="plain"),  
+#        axis.title.x = element_text(margin=margin(30,0,0,0), size=22,angle=0,hjust=.5,vjust=0,face="bold"),
+#        axis.title.y = element_text(margin=margin(0,30,0,0), #size=22,angle=90,hjust=.5,vjust=.5,face="bold")) +
+#  theme(legend.position='top') +
+#  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2)]) +
+#  ylab("LoH rate/cell division") +
+#  xlab("Genomic locus")
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/WSR.txt")
+#wilcox.test(WSR$X30C, WSR$Geldanamycin)
+```
+
+```{r}
+#mylog_trans <- function(base=exp(1), from=0) 
+#{
+#  trans <- function(x) log(x, base)-from
+#  inv <- function(x) base^(x+from)
+#  trans_new("mylog", trans, inv, log_breaks(n=0-from, base=base), 
+#            domain = c(base^from, Inf))
+#}
+#Fluconazole <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/Fluconazole dose.txt")
+#ggplot(Fluconazole, aes(y=Rate, x=Fluconazole, fill=factor(Conc))) +
+#dodge <- position_dodge(width=0.3)
+#  geom_bar(stat='identity', position=dodge, width=0.3) +
+#  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.125) +
+#  scale_y_continuous(trans=mylog_trans(base=10, from=-7)) +#(limits=c(0,0.00025)) +
+#  ggtitle('Fluconazole dose response') +
+#  sd_theme() +
+#  theme(legend.position='top') +
+#  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2)], name='GdA (µM)') +
+#  ylab("LoH rate/cell division") +
+#  xlab("Fluconazole concentration (µg/ml)")
+##no error bars because CIs are less than zero
+```
+
