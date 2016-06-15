@@ -314,19 +314,48 @@ theme(legend.position='bottom', legend.key=element_rect(size=1, color="white"), 
   labs(fill="")
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results="hide"}
 steph <- read.delim("~/Desktop/steph.txt")
 expanded<-untable(steph[,-4], num=steph$Count)
 expanded$Event<-relevel(expanded$Event, ref='geneConversion')
 test <- multinom(Event ~ Chromosome * Treatment, data = expanded)
 test2 <- multinom(Event ~ Chromosome + Treatment, data = expanded)
-anova(test, test2)
 test3 <- multinom(Event ~ Treatment, data = expanded)
-anova(test2, test3)
-test4<- multinom(Event ~ Chromosome, data = expanded)
-anova(test2, test4)
-z <- summary(test)$coefficients/summary(test)$standard.errors
+coeff <-summary(test)$coefficients
+z <- coeff/summary(test)$standard.errors
 p <- (1 - pnorm(abs(z), 0, 1))*2
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(
+  anova(test, test2)
+)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(
+  anova(test2, test3)
+)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(
+  coeff[,1:5]
+)
+knitr::kable(
+  coeff[,6:8]
+)
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(
+  p[,1:5]
+)
+knitr::kable(
+  p[,6:8]
+)
+
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
