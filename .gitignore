@@ -1,0 +1,12 @@
+.RData
+.Rhistory
+*.Rproj*
+.Rapp*
+DataFiles/*
+*.txt
+Figures/*
+*.jpg
+*.pdf
+*.tiff
+*.png
+*.html
