@@ -10,3 +10,4 @@ Figures/*
 *.tiff
 *.png
 *.html
+.Rproj.user
