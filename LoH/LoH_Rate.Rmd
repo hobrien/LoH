@@ -3,6 +3,7 @@ title: "Hsp90 stress and the Candida albicans genome"
 output:
  #tufte::tufte_html: default
   tufte::tufte_handout: default
+
 ---
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -292,7 +293,9 @@ WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_HSP90.txt")
 wilcox.test(WSR$X30C, WSR$HSP90.hsp90)
 ```
 
-`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
+#SNP-RFLP genotyping reveals different types of LoH events on Chr1 and Chr4
+
+`r margin_note("- plotted are percentages of different LoH events on Chr1 (HCM1) and Chr4(AXL2)")`
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 LoHevents <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/SNP_RFLP.txt")
@@ -321,17 +324,27 @@ z <- coeff/summary(test)$standard.errors
 p <- (1 - pnorm(abs(z), 0, 1))*2
 ```
 
+#Multi-nomial regression analyses to distingiush between chromosomal effects and effects of different Hsp90 stresses
+
+- The treatment effect differs between Chr1 and Chr4 (p-value=0.0019408)
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::kable(
   anova(test, test2)
 )
 ```
 
+- LoH event counts differ between Chr1 and Chr4 (p-value=7.15e-05)
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::kable(
   anova(test2, test3)
 )
 ```
+
+
+-Coefficients for main effects and interaction terms
+
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::kable(
@@ -343,6 +356,12 @@ knitr::kable(
 
 ```
 
+-p-values for main effects and interaction terms
+
+-excluding BIR and unknown, high temperature (39C) does not have a significant effect on type of LoH event
+
+-excluding BIR and unknown, treatment with GdA and RAD significantly alters frequency of LoH events (BIR and recomb absent on Chr4)
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::kable(
   p[,1:5]
@@ -353,11 +372,37 @@ knitr::kable(
 
 ```
 
+#Fluconazole MICs on strains derived from flux assays with different Hsp90 stresses
+
+`r margin_note("- plotted are MICs and BBGs for 24 strains per category")`
+`r margin_note("- strains marked on Chr1(HCM1)")`
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 HCM1_MIC<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/HCM1_MIC.txt",sep="\t",header=T)
 HCM1_MIC2<-gather(HCM1_MIC, "Assay", "Value", -Colony, -Hsp90_Stress)
 
 ggplot(HCM1_MIC2, aes(x=Hsp90_Stress, y=Value))+
+  geom_jitter(size=2, position = position_jitter(width = .3))+
+  facet_grid(Assay ~ ., scales="free") +
+  ylab("Count")+
+  xlab("")+
+  sd_theme()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12),
+        axis.text.y = element_text(size=12),
+        axis.title.y=element_text(size=14, face='bold'),
+        legend.position="none"
+        )
+```
+
+
+`r margin_note("- plotted are MICs and BBGs for 24 strains per category")`
+`r margin_note("- strains marked on Chr4(AXL2)")`
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+AXL2_MIC<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/AXL2_MIC.txt",sep="\t",header=T)
+AXL2_MIC2<-gather(AXL2_MIC, "Assay", "Value", -Colony, -Hsp90_Stress)
+
+ggplot(AXL2_MIC2, aes(x=Hsp90_Stress, y=Value))+
   geom_jitter(size=2, position = position_jitter(width = .3))+
   facet_grid(Assay ~ ., scales="free") +
   ylab("Count")+
