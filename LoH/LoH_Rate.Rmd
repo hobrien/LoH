@@ -315,7 +315,7 @@ theme(legend.position='bottom', legend.key=element_rect(size=1, color="white"), 
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results="hide"}
-steph <- read.delim("~/Desktop/steph.txt")
+steph <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH_Counts.txt")
 expanded<-untable(steph[,-4], num=steph$Count)
 expanded$Event<-relevel(expanded$Event, ref='geneConversion')
 test <- multinom(Event ~ Chromosome * Treatment, data = expanded)
@@ -360,13 +360,10 @@ knitr::kable(
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 HCM1_MIC<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/HCM1_MIC.txt",sep="\t",header=T)
-HCM1_MIC<-HCM1_MIC[1:20,1:6]
-HCM1_MIC<-gather(HCM1_MIC, "Hsp90_Stress", "MIC")
-AOV<-aov(MIC ~ Hsp90_Stress, data=HCM1_MIC)
-summary(AOV)
-TukeyHSD(AOV)
-ggplot(HCM1_MIC, aes(x=Hsp90_Stress, y=MIC, colour=Hsp90_Stress))+
-  geom_jitter(size=3, position = position_jitter(width = .3))+
+HCM1_MIC2<-gather(HCM1_MIC, "Assay", "Value", -Colony, -Hsp90_Stress)
+
+ggplot(HCM1_MIC, aes(x=Hsp90_Stress, y=MIC))+
+  geom_jitter(size=2, position = position_jitter(width = .3))+
   ylab("MIC")+
   xlab("")+
   sd_theme()+
@@ -376,6 +373,21 @@ ggplot(HCM1_MIC, aes(x=Hsp90_Stress, y=MIC, colour=Hsp90_Stress))+
         legend.position="none"
         ) +
   scale_color_manual(values=c(rep("dodgerblue2", 3),rep("lightseagreen",3)))
+
+
+ggplot(HCM1_MIC2, aes(x=Hsp90_Stress, y=Value))+
+  geom_jitter(size=2, position = position_jitter(width = .3))+
+  facet_grid(Assay ~ ., scales="free") +
+  ylab("MIC")+
+  xlab("")+
+  sd_theme()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12),
+        axis.text.y = element_text(size=12),
+        axis.title.y=element_text(size=14, face='bold'),
+        legend.position="none"
+        ) +
+  scale_color_manual(values=c(rep("dodgerblue2", 3),rep("lightseagreen",3)))
+
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
