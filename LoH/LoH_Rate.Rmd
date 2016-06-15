@@ -14,6 +14,8 @@ library(RColorBrewer)
 library(grid)
 library(MASS)
 library(tufte)
+library(reshape)
+library(nnet)
 source("~/Dropbox/! Diezmann Lab/R/FormatGGplot.R")
 ```
 
@@ -310,6 +312,21 @@ theme(legend.position='bottom', legend.key=element_rect(size=1, color="white"), 
   ylab("Percent (%)") +
   xlab("Condition") +
   labs(fill="")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+steph <- read.delim("~/Desktop/steph.txt")
+expanded<-untable(steph[,-4], num=steph$Count)
+expanded$Event<-relevel(expanded$Event, ref='geneConversion')
+test <- multinom(Event ~ Chromosome * Treatment, data = expanded)
+test2 <- multinom(Event ~ Chromosome + Treatment, data = expanded)
+anova(test, test2)
+test3 <- multinom(Event ~ Treatment, data = expanded)
+anova(test2, test3)
+test4<- multinom(Event ~ Chromosome, data = expanded)
+anova(test2, test4)
+z <- summary(test)$coefficients/summary(test)$standard.errors
+p <- (1 - pnorm(abs(z), 0, 1))*2
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
