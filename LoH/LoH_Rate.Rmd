@@ -362,32 +362,17 @@ knitr::kable(
 HCM1_MIC<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/HCM1_MIC.txt",sep="\t",header=T)
 HCM1_MIC2<-gather(HCM1_MIC, "Assay", "Value", -Colony, -Hsp90_Stress)
 
-ggplot(HCM1_MIC, aes(x=Hsp90_Stress, y=MIC))+
-  geom_jitter(size=2, position = position_jitter(width = .3))+
-  ylab("MIC")+
-  xlab("")+
-  sd_theme()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12),
-        axis.text.y = element_text(size=12),
-        axis.title.y=element_text(size=14, face='bold'),
-        legend.position="none"
-        ) +
-  scale_color_manual(values=c(rep("dodgerblue2", 3),rep("lightseagreen",3)))
-
-
 ggplot(HCM1_MIC2, aes(x=Hsp90_Stress, y=Value))+
   geom_jitter(size=2, position = position_jitter(width = .3))+
   facet_grid(Assay ~ ., scales="free") +
-  ylab("MIC")+
+  ylab("Count")+
   xlab("")+
   sd_theme()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12),
         axis.text.y = element_text(size=12),
         axis.title.y=element_text(size=14, face='bold'),
         legend.position="none"
-        ) +
-  scale_color_manual(values=c(rep("dodgerblue2", 3),rep("lightseagreen",3)))
-
+        )
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
