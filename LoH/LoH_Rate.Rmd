@@ -394,8 +394,9 @@ ggplot(HCM1_MIC2, aes(x=Hsp90_Stress, y=Value))+
         )
 ```
 
-
+#
 `r margin_note("- plotted are MICs and BBGs for 24 strains per category")`
+
 `r margin_note("- strains marked on Chr4(AXL2)")`
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -405,6 +406,41 @@ AXL2_MIC2<-gather(AXL2_MIC, "Assay", "Value", -Colony, -Hsp90_Stress)
 ggplot(AXL2_MIC2, aes(x=Hsp90_Stress, y=Value))+
   geom_jitter(size=2, position = position_jitter(width = .3))+
   facet_grid(Assay ~ ., scales="free") +
+  ylab("Count")+
+  xlab("")+
+  sd_theme()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12),
+        axis.text.y = element_text(size=12),
+        axis.title.y=element_text(size=14, face='bold'),
+        legend.position="none"
+        )
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+MIC_BBG<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/MIC_BBG.txt",sep="\t",header=T)
+MIC_BBG2<-gather(MIC_BBG, "Assay", "Value", -Colony, -Hsp90_Stress, -Locus)
+
+ggplot(MIC_BBG2, aes(x=Hsp90_Stress, y=Value))+
+  geom_jitter(size=2, position = position_jitter(width = .3))+
+  facet_grid(Assay ~ Locus, scales="free") +
+  ylab("Count")+
+  xlab("")+
+  sd_theme()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12),
+        axis.text.y = element_text(size=12),
+        axis.title.y=element_text(size=14, face='bold'),
+        legend.position="none"
+        )
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+MIC_BBG<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/MIC_BBG-250.txt",sep="\t",header=T)
+MIC_BBG2<-gather(MIC_BBG, "Assay", "Value", -Colony, -Hsp90_Stress, -Locus)
+
+ggplot(MIC_BBG2, aes(x=Hsp90_Stress, y=Value))+
+  geom_jitter(size=2, position = position_jitter(width = .3))+
+  facet_grid(Assay ~ Locus, scales="free") +
   ylab("Count")+
   xlab("")+
   sd_theme()+
