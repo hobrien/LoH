@@ -293,6 +293,8 @@ WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_HSP90.txt")
 wilcox.test(WSR$X30C, WSR$HSP90.hsp90)
 ```
 
+- Kangzhen next collected 24 colonies from four conditions (30C, 39C, GdA, RAD) for two strain backgrounds marking chromosomes 1 (HCM1) and chromosome 4 (AXL2)
+
 #SNP-RFLP genotyping reveals different types of LoH events on Chr1 and Chr4
 
 `r margin_note("- plotted are percentages of different LoH events on Chr1 (HCM1) and Chr4(AXL2)")`
@@ -448,6 +450,23 @@ ggplot(MIC_BBG2, aes(x=Hsp90_Stress, y=Value))+
         axis.text.y = element_text(size=12),
         axis.title.y=element_text(size=14, face='bold'),
         legend.position="none"
+        )
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+MIC_BBG<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/Drug_Genotype_all.txt",sep="\t",header=T)
+MIC_BBG2<-gather(MIC_BBG, "Assay", "Value", -Colony, -Hsp90_Stress, -Locus, -Genotype)
+
+ggplot(MIC_BBG2, aes(x=Hsp90_Stress, y=Value, colour=Genotype))+
+  geom_jitter(size=2, position = position_jitter(width = .3))+
+  facet_grid(Assay ~ Locus, scales="free") +
+  ylab("Count")+
+  xlab("")+
+  sd_theme()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12),
+        axis.text.y = element_text(size=12),
+        axis.title.y=element_text(size=14, face='bold'),
+        legend.position="bottom"
         )
 ```
 
