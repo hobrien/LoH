@@ -1,8 +1,8 @@
 ---
 title: "Hsp90 stress and the Candida albicans genome"
-output:
+output: pdf_document
  #tufte::tufte_html: default
-  tufte::tufte_handout: default
+  #tufte::tufte_handout: default
 
 ---
 
@@ -39,10 +39,6 @@ knitr::opts_chunk$set(fig.height=4, dev.args = list(bg = 'transparent'),
 
 #Hsp90 inhibitor dose response
 
-`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
-`r margin_note("- Strain used MYO1/MYO1::URA3, marking chromosome 5L ")`
-`r margin_note("- subsequent experiments were conducted with 3 µM GdA or RAD as they were also the highest doses possible before cell shape changed influencing the CFU assay")`
-
 ```{r }
 GdA.RAD.dose <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/GdA RAD dose.txt")
 dodge <- position_dodge(width=0.6)
@@ -57,12 +53,14 @@ ggplot(GdA.RAD.dose, aes(y=Rate, x=Conc, fill=Inhibitor)) +
   xlab("Inhibitor concentration (µM)")
 ```
 
+- plotted are LoH rates with 95\% confidence intervals
+- Strain used \textit{MYO1/MYO1::URA3}, marking chromosome 5L
+- subsequent experiments were conducted with 3 µM GdA or RAD as they were the highest doses eliciting an increase in LoH without affecting cell shape (elongating cells and possibliy affecting the CFU assay)
+
+#Temperature affects Hsp90 levels and LoH rates
 
 
-#Temperature and Hsp90 inhibition synergistically increase LoH
-
-`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
-`r margin_note("- Strain used MYO1/MYO1::URA3, marking chromosome 5L ")`
+##Temperature and Hsp90 inhibition synergistically increase LoH
 
 ```{r}
 Comparison <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/Comparison2.txt")
@@ -81,14 +79,13 @@ ggplot(Comparison, aes(y=Rate, x=Temperature, fill=Temperature)) +
   xlab("Condition")
 ```
 
+- plotted are LoH rates with 95\\% confidence intervals
+- Strain used MYO1/MYO1::URA3, marking chromosome 5L
 
 
 #Genome-wide LoH rates are affected by temperature and pharmacological inhibition of Hsp90
 
 ##Genome-wide LoH rates at 30C and 37C
-
-`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
-`r margin_note("- p-value = 8.227e-05")`
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -106,6 +103,9 @@ ggplot(subset(Genome, Treatment == '30C' | Treatment == '37C'), aes(y=Rate, x=Lo
   xlab("Genomic locus")
 ```
 
+- plotted are LoH rates with 95\\% confidence intervals
+- p-value = 8.227e-05
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_37C.txt")
 wilcox.test(WSR$X30C, WSR$X37C)
@@ -113,9 +113,6 @@ wilcox.test(WSR$X30C, WSR$X37C)
 
 
 ##Genome-wide LoH rates at 30C and 39C
-
-`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
-`r margin_note("- p-value = 8.227e-05")`
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -133,6 +130,9 @@ ggplot(subset(Genome, Treatment == '30C' | Treatment == '39C'), aes(y=Rate, x=Lo
   xlab("Genomic locus")
 ```
 
+- plotted are LoH rates with 95\\% confidence intervals
+- p-value = 8.227e-05
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_39C.txt")
 wilcox.test(WSR$X30C, WSR$X39C)
@@ -140,9 +140,6 @@ wilcox.test(WSR$X30C, WSR$X39C)
 
 
 ##Comparison of genome-wide LoH rates at 37C and 39C
-
-`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
-`r margin_note("- p-value = 0.3865")`
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -160,6 +157,9 @@ ggplot(subset(Genome, Treatment == '37C' | Treatment == '39C'), aes(y=Rate, x=Lo
   xlab("Genomic locus")
 ```
 
+- plotted are LoH rates with 95\\% confidence intervals
+- p-value = 0.3865
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_37C_39C.txt")
 wilcox.test(WSR$X37C, WSR$X39C)
@@ -167,8 +167,6 @@ wilcox.test(WSR$X37C, WSR$X39C)
 
 
 ##Comparison of genome-wide LoH rates at 30C, 37C and 39C
-
-`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -186,10 +184,9 @@ ggplot(subset(Genome, Treatment == '30C' | Treatment == '37C' | Treatment == '39
   xlab("Genomic locus")
 ```
 
-##Genome-wide LoH rates when treated with 3 µM Geldanamycin at 30C
+- plotted are LoH rates with 95\\% confidence intervals
 
-`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
-`r margin_note("- p-value = 0.0104")`
+##Genome-wide LoH rates when treated with 3 µM Geldanamycin at 30C
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -207,6 +204,9 @@ ggplot(subset(Genome, Treatment == '30C' | Treatment == 'Geldanamycin'), aes(y=R
   xlab("Genomic locus")
 ```
 
+- plotted are LoH rates with 95\\% confidence intervals
+- p-value = 0.0104
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_GdA.txt")
 wilcox.test(WSR$X30C, WSR$Geldanamycin)
@@ -214,9 +214,6 @@ wilcox.test(WSR$X30C, WSR$Geldanamycin)
 
 
 ##Genome-wide LoH rates when treated with 3 µM Radicicol at 30C
-
-`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
-`r margin_note("- p-value = 0.017")`
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -234,6 +231,9 @@ ggplot(subset(Genome, Treatment == '30C' | Treatment == 'Radicicol'), aes(y=Rate
   xlab("Genomic locus")
 ```
 
+- plotted are LoH rates with 95\\% confidence intervals
+- p-value = 0.017
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_RAD.txt")
 wilcox.test(WSR$X30C, WSR$RAD)
@@ -241,9 +241,6 @@ wilcox.test(WSR$X30C, WSR$RAD)
 
 
 ##Comparison of genome-wide LoH rates when treated with 3 µM Geldanamycin or Radicicol at 30C
-
-`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
-`r margin_note("- p-value = 0.9296")`
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -261,6 +258,9 @@ ggplot(subset(Genome, Treatment == '30C' | Treatment == 'Radicicol' | Treatment 
   xlab("Genomic locus")
 ```
 
+- plotted are LoH rates with 95\\% confidence intervals
+- p-value = 0.9296
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_GdA_RAD.txt")
 wilcox.test(WSR$GdA, WSR$RAD)
@@ -268,9 +268,6 @@ wilcox.test(WSR$GdA, WSR$RAD)
 
 
 ##Genome-wide LoH rates in the HSP90/hsp90 heterozygous strain at 30C
-
-`r margin_note("- plotted are LoH rates with 95\\% confidence intervals")`
-`r margin_note("- p-value = 0.791")`
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -288,6 +285,9 @@ ggplot(subset(Genome, Treatment == '30C' | Treatment == 'HSP90/hsp90'), aes(y=Ra
   xlab("Genomic locus")
 ```
 
+- plotted are LoH rates with 95\\% confidence intervals
+- p-value = 0.791
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_HSP90.txt")
 wilcox.test(WSR$X30C, WSR$HSP90.hsp90)
@@ -296,8 +296,6 @@ wilcox.test(WSR$X30C, WSR$HSP90.hsp90)
 - Kangzhen next collected 24 colonies from four conditions (30C, 39C, GdA, RAD) for two strain backgrounds marking chromosomes 1 (HCM1) and chromosome 4 (AXL2)
 
 #SNP-RFLP genotyping reveals different types of LoH events on Chr1 and Chr4
-
-`r margin_note("- plotted are percentages of different LoH events on Chr1 (HCM1) and Chr4(AXL2)")`
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 LoHevents <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/SNP_RFLP.txt")
@@ -313,6 +311,8 @@ theme(legend.position='bottom', legend.key=element_rect(size=1, color="white"), 
   xlab("Condition") +
   labs(fill="")
 ```
+
+- plotted are percentages of different LoH events on Chr1 (HCM1) and Chr4(AXL2)
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results="hide"}
 steph <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH_Counts.txt")
@@ -376,9 +376,6 @@ knitr::kable(
 
 #Fluconazole MICs on strains derived from flux assays with different Hsp90 stresses
 
-`r margin_note("- plotted are MICs and BBGs for 24 strains per category")`
-`r margin_note("- strains marked on Chr1(HCM1)")`
-
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 HCM1_MIC<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/HCM1_MIC.txt",sep="\t",header=T)
 HCM1_MIC2<-gather(HCM1_MIC, "Assay", "Value", -Colony, -Hsp90_Stress)
@@ -396,10 +393,10 @@ ggplot(HCM1_MIC2, aes(x=Hsp90_Stress, y=Value))+
         )
 ```
 
-#
-`r margin_note("- plotted are MICs and BBGs for 24 strains per category")`
+- plotted are MICs and BBGs for 24 strains per category
+- strains marked on Chr1(HCM1)
 
-`r margin_note("- strains marked on Chr4(AXL2)")`
+#
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 AXL2_MIC<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/AXL2_MIC.txt",sep="\t",header=T)
@@ -418,6 +415,8 @@ ggplot(AXL2_MIC2, aes(x=Hsp90_Stress, y=Value))+
         )
 ```
 
+- plotted are MICs and BBGs for 24 strains per category
+- strains marked on Chr4(AXL2)
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 MIC_BBG<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/MIC_BBG.txt",sep="\t",header=T)
@@ -460,6 +459,25 @@ MIC_BBG2<-gather(MIC_BBG, "Assay", "Value", -Colony, -Hsp90_Stress, -Locus, -Gen
 ggplot(MIC_BBG2, aes(x=Hsp90_Stress, y=Value, colour=Genotype))+
   geom_jitter(size=2, position = position_jitter(width = .3))+
   facet_grid(Assay ~ Locus, scales="free") +
+  scale_color_manual(values=brewer.pal(12, "Set3")[c(1,11,3,5,8,10)]) +
+  ylab("Count")+
+  xlab("")+
+  sd_theme()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12),
+        axis.text.y = element_text(size=12),
+        axis.title.y=element_text(size=14, face='bold'),
+        legend.position="bottom"
+        )
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+MIC_BBG<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/Drug_Genotype_small.txt",sep="\t",header=T)
+MIC_BBG2<-gather(MIC_BBG, "Assay", "Value", -Colony, -Hsp90_Stress, -Locus, -Genotype)
+
+ggplot(MIC_BBG2, aes(x=Hsp90_Stress, y=Value, colour=Genotype))+
+  geom_jitter(size=2, position = position_jitter(width = .3))+
+  facet_grid(Assay ~ Locus, scales="free") +
+  scale_color_manual(values=brewer.pal(12, "Set3")[c(1,11,3,5,8,10)]) +
   ylab("Count")+
   xlab("")+
   sd_theme()+
