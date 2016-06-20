@@ -627,6 +627,23 @@ knitr::kable(
 
 - When analysing Chromosome 1 only, a significant effect for 39$^{\circ}$C can be detected for BBG (top, p - value = 0.0417382) and MIC (bottom, p - value = 0.0348377)
 
+\pagebreak
+
+# Do Hsp90-stress induced LoH events affect growth rates?
+
+## Growth curves (raw data) for Chromosome 1 (HCM1) marked strains
+
+![Growth at 30$^{\circ}$C in YPD recorded in half hour increments over 23.5 hours.](../Figures/Growth\ Curves/Growth_30C_HCM1.png)
+
+![Growth at 37$^{\circ}$C in YPD recorded in half hour increments over 23.5 hours.](../Figures/Growth\ Curves/Growth_37C_HCM1.png)
+
+![Growth at 39$^{\circ}$C in YPD recorded in half hour increments over 23.5 hours.](../Figures/Growth\ Curves/Growth_39C_HCM1.png)
+
+![Growth in 3 µM RAD in YPD recorded in half hour increments over 23.5 hours.](../Figures/Growth\ Curves/Growth_RAD_HCM1.png)
+
+![Growth at 30$^{\circ}$C in YPD recorded in half hour increments over 23.5 hours.](../Figures/Growth\ Curves/Growth_30C_AXL2.png)
+
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 #Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
 #Genome$Locus <- factor(Genome$Locus, levels=c("GAL1", "PHO85", "HCM1", "AXL2",  "TUB4",  "MYO1", "BUD7",  "SAP5",  "LIP4"))
