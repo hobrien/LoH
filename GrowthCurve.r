@@ -19,9 +19,27 @@ ggplot(df, aes(x=t, y=log10(OD), group=paste(Sample, Temperature), colour=Temper
   theme(legend.position="bottom") +
   theme(legend.direction= "horizontal")
 
-test <-subset(df, Sample == 'Sample X3')
-test$LOG10N<-log10(test$OD+1)
-test <- select(test, t, LOG10N)
-plot(test)
-nls <-nls(baranyi, test, list(lag=1, mumax=.5, LOG10N0 = .1, LOG10Nmax = 0.45))
-plotfit(nls, smooth=TRUE)
+MuMax <- function(od, time){
+    test = data.frame(OD=od, t=time)
+    #test <-subset(df, Sample == name)
+    test$LOG10N<-log10(test$OD)
+    test <- select(test, t, LOG10N)
+    if (max(test$LOG10N)-min(test$LOG10N) > 0.1) {
+         mumax<- tryCatch({
+          nls1 <- nls(baranyi, test, list(lag=1, mumax=min(1,(max(test$LOG10N)-min(test$LOG10N))*2), LOG10N0 = min(test$LOG10N), LOG10Nmax = max(test$LOG10N)))
+          nls1$m$getPars()[2][[1]]
+        }, error = function(err) {
+          NA
+        })
+        
+        #plot(test)
+        #plotfit(nls1, smooth=TRUE)
+        
+    }
+    else {
+        mumax <- 0
+    }
+    mumax
+}
+
+AllMuMax <-df %>% group_by(Sample) %>% summarise(mumax=MuMax(OD, t))
