@@ -21,37 +21,48 @@ MuMax <- function(test){
                           LOG10Nmax = max(test$LOG10N)))
 }
 
-AllMuMax <- function(growth){
+GetAllMuMax <- function(growth){
+  tmax<- max(growth$t)
   growth <- group_by(growth, Sample, Column, Row) %>% nest()
-  AllMuMax <- mutate(growth, Mod=map(data, possibly(MuMax, NA)))
-  AllMuMax <- mutate(AllMuMax, params= Mod %>% map(tidy))
-  labels <- unnest(AllMuMax, params) %>% 
+  results <- mutate(growth, Mod=map(data, possibly(MuMax, NA)))
+  results <- mutate(results, params= Mod %>% map(tidy))
+  results <- unnest(results, params) %>% 
     subset(term == 'mumax') %>% 
-    select(Sample, mumax=round(estimate, digits=2), mumax.se=std.error) %>%
+    select(Sample, mumax=round(estimate, digits=2), mumax.se=std.error, mumax.p=p.value) %>%
     full_join(growth) %>%
-    mutate(t=tmax)
-  labels  
+    mutate(t=tmax) %>%
+    subset(mumax.p <0.01)
+  results  
 }
 
-30deg <- read.delim("GrowthCurves/Growth_30C_AXL2.txt", header=TRUE, check.names = FALSE)
-30deg<-prepareData(30deg)
+deg30 <- read.delim("GrowthCurves/Growth_30C_AXL2.txt", header=TRUE, check.names = FALSE)
+deg30<-prepareData(deg30)
+deg30 <-GetAllMuMax(deg30)
+colnames(deg30)[c(2,3,4)] <- c('mumax30', 'mumax.se30', 'mumax.p30')
 
-mid_time <- ifelse(length(30deg$t) %% 2 == 0, median(30deg$t[1:length(30deg$t)-1]), median(30deg$t))
-min_od <-log10(min(30deg$OD))
-tmax <- max(30deg$t)
-
-labels <-AllMuMax(30deg)
-
+deg39 <- read.delim("GrowthCurves/Growth_39C_AXL2.txt", header=TRUE, check.names = FALSE)
+deg39 <-prepareData(deg39)
+deg39 <- GetAllMuMax(deg39)
+colnames(deg39)[c(2,3,4)] <- c('mumax39', 'mumax.se39', 'mumax.p39')
 
 
 info <- read.delim("GrowthCurves/Growth_AXL2_LoH.txt", header=TRUE, check.names = FALSE)
 info<-info[-c(1,2,3,4),]
-labels <- full_join(labels, info)
+
+combined <- deg39[,c(1,2,3)] %>% full_join(deg30) %>% full_join(info)
+ggplot(combined, aes(x=mumax30, y=mumax39, colour=Genotype)) + 
+  geom_point() +
+  facet_grid(. ~ Hsp90_Stress) +
+  coord_fixed() +
+  scale_x_continuous(breaks=c(.3,.6,.9,1.2)) +
+  scale_y_continuous(breaks=c(.3,.6,.9,1.2))
+
+labels <- left_join(deg30, info)
 
 
-ggplot(unnest(labels[,-7], data), aes(x=t, y=log10(OD), colour=Hsp90_Stress)) +
+ggplot(unnest(labels[,-8], data), aes(x=t, y=log10(OD), colour=Hsp90_Stress)) +
   geom_point(size=.01) +
-  geom_text(aes(label=round(mumax, digits=3)), data=labels, colour='black', size=2, y=min_od, vjust=-1, hjust=1) +
+  geom_text(aes(label=round(mumax30, digits=3)), data=labels, colour='black', size=2, y=-1, vjust=-1, hjust=1) +
   facet_grid(Row ~ Column) +
   theme(axis.text=element_blank()) +
   theme(axis.ticks=element_blank()) +
