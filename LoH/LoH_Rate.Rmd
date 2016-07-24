@@ -50,6 +50,8 @@ This document is to summarize the current status of affairs. Not every figure or
 
 - Once we are done with collecting growth curve data and analysing FACS data, I suggest, we plot genome content and LoH events relative to MIC/BBG and growth as shown now in some examples here.
 
+- Lastly, I am wondering if we should attempt to assess Hsp90 activity by measuring protein levels of client proteins. Hog1 and Cdc28 would be good candidates as they can be measured using available antibodies.
+
 We would very much appreciate everybody's feedback. Maybe we should have a skype conference once you had a chance to digest.
 
 * * * 
@@ -112,8 +114,8 @@ ggplot(Temperature, aes(y=Rate, x=Temperature, fill=Temperature)) +
 - experiment done at 30$^{\circ}$C
 
 ```{r}
-Temperature <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/Genetics_LoH.txt")
-ggplot(Temperature, aes(y=Rate, x=Temperature, fill=Temperature)) +
+Genotype <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/Genetics_LoH.txt")
+ggplot(Genotype, aes(y=Rate, x=Genotype, fill=Genotype)) +
   geom_bar(stat='identity', position=dodge, width=0.6) +
   geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.25) +
   #ggtitle('LoH rates at the MYO1 (Chr 5L) locus in different conditions') +
@@ -148,7 +150,8 @@ ggplot(Comparison, aes(y=Rate, x=Temperature, fill=Temperature)) +
   xlab("Condition")
 ```
 
-It appears that Hsp90 activity is relevant for LoH rather than Hsp90 levels. Increasing temperatures result in increased LoH rates. It is assumed that at higher than normal temperatures, Hsp90 is tied up in stabilizing proteins and the pool of available Hsp90 is reduced. Combining that with Hsp90 inhibition, results in even higher LoH rates, suggesting that Hsp90 activity is reduced to a minimum.
+It appears that Hsp90 activity is relevant for LoH rather than Hsp90 levels. Increasing temperatures result in increased LoH rates. It is assumed that at higher than normal temperatures, Hsp90 is tied up in stabilizing proteins and the pool of available Hsp90 is reduced. Combining that with Hsp90 inhibition, results in even higher LoH rates, suggesting that Hsp90 activity is reduced to a minimum. It may be useful to show Hsp90 client protein levels (Hog1 or Cdc38) as proxy for Hsp90 activity.
+
 
 #Genome-wide LoH rates
 
@@ -362,6 +365,27 @@ wilcox.test(WSR$X30C, WSR$HSP90.hsp90)
 ```
 
 Kangzhen next collected 24 colonies from four conditions (30$^{\circ}$C, 39$^{\circ}$C, GdA, RAD) for two strain backgrounds marking chromosomes 1 (HCM1) and chromosome 4 (AXL2)
+
+
+##LoH rates appear to be exceptionally high on Chr4R (TUB4)
+
+```{r}
+Loci <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/Locus.txt")
+dodge <- position_dodge(width=0.6)
+Loci$Locus <- factor(Loci$Locus, levels = unique(Loci$Locus))
+ggplot(Loci, aes(y=Rate, x=Treatment, fill=Treatment)) +
+  geom_bar(stat='identity', position=dodge, width=0.6) +
+  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.25) +
+  #ggtitle('LoH rates at the MYO1 (Chr 5L) locus in different conditions') +
+  facet_grid(. ~ Locus) +
+  pdf_theme() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  theme(legend.position='bottom') +
+  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2,4,9,5,10)]) +
+  ylab("LoH rate/cell division") +
+  xlab("Treatment")
+```
+
 
 #Different types of LoH events on Chr1 and Chr4
 
