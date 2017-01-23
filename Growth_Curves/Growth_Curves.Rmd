@@ -1,0 +1,33 @@
+---
+title: "Growth Curves"
+author: "SD"
+date: "25 August 2016"
+output: pdf_document
+---
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+rm(list=ls())
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(RColorBrewer)
+library(grid)
+library(MASS)
+library(tufte)
+library(reshape)
+library(nnet)
+source("~/Dropbox/! Diezmann Lab/R/FormatGGplot.R")
+
+PlatePos <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/Growth_Curves/PlatePos3.TXT", comment.char="#", check.names = FALSE)
+
+Growth <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/Growth_Curves/220816.TXT", comment.char="#", check.names = FALSE)
+
+Growth2 <- mutate(PlatePos, pos = paste(row, col, sep='')) %>%
+  full_join(Growth, by=c('pos' = 'Time')) %>%
+  dplyr::select(-col, -row, -pos) %>% 
+  group_by(strain, condition) %>% 
+  summarise_each(funs(mean))
+
+  write.table(Growth2, file="~/Dropbox/! Diezmann Lab/R/LoH/Growth_Curves/AXL2_9-12_RAD.txt", row.names = FALSE, quote = FALSE)
+```
