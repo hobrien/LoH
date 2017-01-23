@@ -21,19 +21,20 @@ Ca_301216 <- read_delim("~/Dropbox/! Diezmann Lab/R/Buffering/Ca_301216.txt",
 "\t", escape_double = FALSE, trim_ws = TRUE)
 Ca_301216<-gather(Ca_301216, Time, OD, -Well)
 Ca_301216$Time = as.numeric(Ca_301216$Time)
-ggplot(Ca_301216, aes(x=Time, y=OD, group=Well)) + geom_line()
-Ca_301216_fit <- group_by(Ca_301216, Well) %>% 
+Ca_301216 <- mutate(Ca_301216, Row = substr(Well, 1, 1), Column = as.numeric(substr(Well, 2, nchar(Well))))
+Ca_301216_fit <- group_by(Ca_301216, Well, Row, Column) %>% 
   nest() %>% 
-  mutate(fit=map(data, ~ fit_growth(., Time, OD, type='logistic'))) %>%
+  mutate(fit=map(data, ~ fit_growth(., Time, OD, type='logistic'))) %>% 
   mutate(Vmax=map(map(map(map(fit, 3), 'parameters'), 'A'), 1),
          VmaxSE=map(map(map(map(fit, 3), 'parameters'), 'A'), 2),
          max_rate=map(map(map(map(fit, 3), 'parameters'), 'mu'), 1),
          max_rateSE=map(map(map(map(fit, 3), 'parameters'), 'mu'), 2)) %>%
          unnest(Vmax, VmaxSE, max_rate, max_rateSE)
+select(Ca_301216_fit, Well, Vmax, VmaxSE, max_rate, max_rateSE) %>%
+  write_tsv("~/Dropbox/! Diezmann Lab/R/Buffering/Ca_301216_results.txt")
 ```
 ```{r}
-Ca_301216 <- mutate(Ca_301216, Row = substr(Well, 1, 1), Column = substr(Well, 2, nchar(Well)))
-Ca_301216_fit <- mutate(Ca_301216_fit, Row = substr(Well, 1, 1), Column = substr(Well, 2, nchar(Well)))
+
 
 ggplot(Ca_301216, aes(x=Time, y=OD, group=Well)) +
       geom_line() +
@@ -44,5 +45,6 @@ ggplot(Ca_301216, aes(x=Time, y=OD, group=Well)) +
       theme(axis.ticks=element_blank()) +
       theme(legend.position="bottom") +
       theme(legend.direction= "horizontal")
+ggsave("~/Dropbox/! Diezmann Lab/R/Buffering/Ca_301216_grid.png")
 ```
 
