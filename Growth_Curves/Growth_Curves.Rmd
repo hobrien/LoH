@@ -28,9 +28,21 @@ Ca_301216_fit <- group_by(Ca_301216, Well) %>%
   mutate(Vmax=map(map(map(map(fit, 3), 'parameters'), 'A'), 1),
          VmaxSE=map(map(map(map(fit, 3), 'parameters'), 'A'), 2),
          max_rate=map(map(map(map(fit, 3), 'parameters'), 'mu'), 1),
-         max_rateSE=map(map(map(map(fit, 3), 'parameters'), 'mu'), 2)) 
+         max_rateSE=map(map(map(map(fit, 3), 'parameters'), 'mu'), 2)) %>%
+         unnest(Vmax, VmaxSE, max_rate, max_rateSE)
 ```
 ```{r}
+Ca_301216 <- mutate(Ca_301216, Row = substr(Well, 1, 1), Column = substr(Well, 2, nchar(Well)))
+Ca_301216_fit <- mutate(Ca_301216_fit, Row = substr(Well, 1, 1), Column = substr(Well, 2, nchar(Well)))
 
+ggplot(Ca_301216, aes(x=Time, y=OD, group=Well)) +
+      geom_line() +
+      #geom_label(aes(label=Vmax), data=Ca_301216_fit) +
+      geom_text(data=Ca_301216_fit, aes(label = signif(Vmax, 4)), x=22000, y=1.8, size=2) +
+      facet_grid(Row ~ Column) +
+      theme(axis.text=element_blank()) +
+      theme(axis.ticks=element_blank()) +
+      theme(legend.position="bottom") +
+      theme(legend.direction= "horizontal")
 ```
 
