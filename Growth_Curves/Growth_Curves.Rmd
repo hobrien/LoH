@@ -1,33 +1,36 @@
 ---
 title: "Growth Curves"
-author: "SD"
-date: "25 August 2016"
-output: pdf_document
+output: html_notebook
 ---
 
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-rm(list=ls())
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(RColorBrewer)
-library(grid)
-library(MASS)
-library(tufte)
-library(reshape)
-library(nnet)
-source("~/Dropbox/! Diezmann Lab/R/FormatGGplot.R")
-
-PlatePos <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/Growth_Curves/PlatePos3.TXT", comment.char="#", check.names = FALSE)
-
-Growth <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/Growth_Curves/220816.TXT", comment.char="#", check.names = FALSE)
-
-Growth2 <- mutate(PlatePos, pos = paste(row, col, sep='')) %>%
-  full_join(Growth, by=c('pos' = 'Time')) %>%
-  dplyr::select(-col, -row, -pos) %>% 
-  group_by(strain, condition) %>% 
-  summarise_each(funs(mean))
-
-  write.table(Growth2, file="~/Dropbox/! Diezmann Lab/R/LoH/Growth_Curves/AXL2_9-12_RAD.txt", row.names = FALSE, quote = FALSE)
+```{r}
+library(growthcurve)
+library(tidyverse)
 ```
+
+```{r}
+Sc30_OD <- read_delim("~/Dropbox/! Diezmann Lab/R/Networks/GrowthCurves/Sc30_OD.txt",
+"\t", escape_double = FALSE, trim_ws = TRUE)
+colnames(Sc30_OD)[1] <- 'Time'
+Sc30_fit <-fit_growth(Sc30_OD, Time, YPD, type='logistic')
+Sc30_fit$parameters
+```
+
+```{r}
+Ca_301216 <- read_delim("~/Dropbox/! Diezmann Lab/R/Buffering/Ca_301216.txt",
+"\t", escape_double = FALSE, trim_ws = TRUE)
+Ca_301216<-gather(Ca_301216, Time, OD, -Well)
+Ca_301216$Time = as.numeric(Ca_301216$Time)
+ggplot(Ca_301216, aes(x=Time, y=OD, group=Well)) + geom_line()
+Ca_301216_fit <- group_by(Ca_301216, Well) %>% 
+  nest() %>% 
+  mutate(fit=map(data, ~ fit_growth(., Time, OD, type='logistic'))) %>%
+  mutate(Vmax=map(map(map(map(fit, 3), 'parameters'), 'A'), 1),
+         VmaxSE=map(map(map(map(fit, 3), 'parameters'), 'A'), 2),
+         max_rate=map(map(map(map(fit, 3), 'parameters'), 'mu'), 1),
+         max_rateSE=map(map(map(map(fit, 3), 'parameters'), 'mu'), 2)) 
+```
+```{r}
+
+```
+
