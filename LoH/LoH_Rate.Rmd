@@ -28,16 +28,42 @@ knitr::opts_chunk$set(fig.height=4, dev.args = list(bg = 'transparent'),
 
 * * * 
 
-##Summary of results
+#Summary of results
 
-1. Increasing concentrations of the Hsp90 inhibitors Geldanamycin (GdA) and Radicicol (RAD) result in increased LoH rates
-2. Perturbing Hsp90 levels by high temperature or Hsp90 inhibtor treatment results in increased LoH rates across the genome
-3. 
+1. Hsp90 is required for faithful maintenance of a diploid genome in \textit{Candida albicans} - increasing concentrations of the Hsp90 inhibitors Geldanamycin (GdA) and Radicicol (RAD) result in increased LoH rates and aneuploidies.
+2. Inhibition of Hsp90 signficantly alters the frequency of LoH events on the two chromosomes genotyped here (Chr1 and Chr4).
+3. Genetic changes caused by Hsp90 perturbations appear to be adaptive wrt subsequent exposure to fluconazole or high temperature.
 
+I think, I am finally catching on to what Judy has been talking about for the last two years. Upon re-reading the Lindquist papers on Hsp90 "capacitating" evolution (Rutherford and Lindquist 1998; Queitsch, Sangster and Lindquist 2002; Jarosz and Lindquist 2010), I realized that while these papers talk about evolution, they do not show the genetic changes that would constitute evolution and explain why their traits are fixed after a few generations.
+
+If I am not mistaken, we are showing genetic changes upon changes in Hsp90 activity ranging from small (gene conversions) to large (aneuploidy). I would thus suggest that we write this paper proposing an evolutionary mechanism (LoH and aneuploidy) by which Hsp90 capacitates evolution. It appears some of these changes may even be adaptive during subsequent drug exposure and growth at high temperatures. LoH and aneuploidies could be an alternative mechanism to the transposon activation already proposed in Drosophila (Specchia et al., 2010). 
+
+This document is to summarize the current status of affairs. Not every figure or table is meant to be in the paper but is included here to provide a complete picture.
+
+#Remaining tasks
+
+- We will repeat the growth curves as per Anja's suggestions. The current plot at the very end of this document is just a suggestion on how to present the data based on our preliminary results.
+
+- Finish analysing our FACS data. While visiting with Anja, Kanghzen learned how to analyse our FACS results and turn them into violin plots.
+
+- As for identifying the mechanism by which Hsp90 perturbations cause LoH and aneuploidies, Judy suggested some DNA repair and kinetochor complex genes based on my previous Hsp90 network work. We selected a few and Lina generated the following LoH tester strains: (a) tel1/tel1 MYO1::URA3; (b) tel1/tel1 AXL2::URA3 (c) hsl1/hsl1 MYO1::URA3; (d) hsl1/hsl1 AXL2::URA3; (e) hsl1/hsl1 HCM1::URA3. We are also looking into generating gin1 and sti1 mutants. We used MYO1::URA3 as our initial tester strain for dose-response curves etc. AXL2::URA3 and HCM1::URA3 are the strains we genotyped for LoH events. We may decide showing changes in LoH in these strains without Hsp90 perturbations is sufficient but if we decide to go further, we have the option of genotyping the same backgrounds used here.
+
+- Once we are done with collecting growth curve data and analysing FACS data, I suggest, we plot genome content and LoH events relative to MIC/BBG and growth as shown now in some examples here.
+
+- Lastly, I am wondering if we should attempt to assess Hsp90 activity by measuring protein levels of client proteins. Hog1 and Cdc28 would be good candidates as they can be measured using available antibodies.
+
+We would very much appreciate everybody's feedback. Maybe we should have a skype conference once you had a chance to digest.
 
 * * * 
 
-#Hsp90 inhibitor dose response
+
+# Temperature and Hsp90 inhibition result in increased LoH rates
+
+##Hsp90 inhibitor dose response
+
+- plotted are LoH rates with 95\% confidence intervals
+- Strain used \textit{MYO1/MYO1::URA3}, marking chromosome 5L
+- subsequent experiments were conducted with 3 µM GdA or RAD as they were the highest doses eliciting an increase in LoH without affecting cell shape (elongating cells and possibliy affecting the CFU assay)
 
 ```{r }
 GdA.RAD.dose <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/GdA RAD dose.txt")
@@ -53,14 +79,59 @@ ggplot(GdA.RAD.dose, aes(y=Rate, x=Conc, fill=Inhibitor)) +
   xlab("Inhibitor concentration (µM)")
 ```
 
+#
+
+##Increasing temperatures result in increased Hsp90 levels and LoH rates
+
+![Hsp90 levels at three different temperatures. Protein levels normalized to loading control.](../Figures/Western\ blots/Temperature_Hsp90.png)
+
 - plotted are LoH rates with 95\% confidence intervals
 - Strain used \textit{MYO1/MYO1::URA3}, marking chromosome 5L
-- subsequent experiments were conducted with 3 µM GdA or RAD as they were the highest doses eliciting an increase in LoH without affecting cell shape (elongating cells and possibliy affecting the CFU assay)
-
-#Temperature affects Hsp90 levels and LoH rates
 
 
-##Temperature and Hsp90 inhibition synergistically increase LoH
+```{r}
+Temperature <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/Temperature_LoH.txt")
+ggplot(Temperature, aes(y=Rate, x=Temperature, fill=Temperature)) +
+  geom_bar(stat='identity', position=dodge, width=0.6) +
+  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.25) +
+  #ggtitle('LoH rates at the MYO1 (Chr 5L) locus in different conditions') +
+  #facet_grid(. ~ Treatment) +
+  pdf_theme() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  theme(legend.position='bottom') +
+  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2,4)]) +
+  ylab("LoH rate/cell division") +
+  xlab("Condition")
+```
+
+
+##Genetically reducing Hsp90 levels does not affect LoH rate
+
+![Hsp90 levels at three different temperatures. Protein levels normalized to loading control.](../Figures/Western\ blots/Genetics_Hsp90.png)
+
+- plotted are LoH rates with 95\% confidence intervals
+- strain used \textit{MYO1/MYO1::URA3}, marking chromosome 5L
+- experiment done at 30$^{\circ}$C
+
+```{r}
+Genotype <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/Genetics_LoH.txt")
+ggplot(Genotype, aes(y=Rate, x=Genotype, fill=Genotype)) +
+  geom_bar(stat='identity', position=dodge, width=0.6) +
+  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.25) +
+  #ggtitle('LoH rates at the MYO1 (Chr 5L) locus in different conditions') +
+  #facet_grid(. ~ Treatment) +
+  pdf_theme() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  theme(legend.position='bottom') +
+  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2,4)]) +
+  ylab("LoH rate/cell division") +
+  xlab("Genotype")
+```
+
+##Temperature and pharmacological inhibition of Hsp90 synergistically increase LoH rates on Chromosome 5L
+
+- plotted are LoH rates with 95\% confidence intervals
+- Strain used MYO1/MYO1::URA3, marking chromosome 5L
 
 ```{r}
 Comparison <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/Comparison2.txt")
@@ -79,13 +150,15 @@ ggplot(Comparison, aes(y=Rate, x=Temperature, fill=Temperature)) +
   xlab("Condition")
 ```
 
-- plotted are LoH rates with 95\\% confidence intervals
-- Strain used MYO1/MYO1::URA3, marking chromosome 5L
+It appears that Hsp90 activity is relevant for LoH rather than Hsp90 levels. Increasing temperatures result in increased LoH rates. It is assumed that at higher than normal temperatures, Hsp90 is tied up in stabilizing proteins and the pool of available Hsp90 is reduced. Combining that with Hsp90 inhibition, results in even higher LoH rates, suggesting that Hsp90 activity is reduced to a minimum. It may be useful to show Hsp90 client protein levels (Hog1 or Cdc38) as proxy for Hsp90 activity.
 
 
-#Genome-wide LoH rates are affected by temperature and pharmacological inhibition of Hsp90
+#Genome-wide LoH rates
 
-##Genome-wide LoH rates at 30C and 37C
+##Growth at 37$^{\circ}$C significantly increases LoH rates across the genome
+
+- plotted are LoH rates with 95\% confidence intervals
+- p-value = 8.227e-05
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -103,16 +176,16 @@ ggplot(subset(Genome, Treatment == '30C' | Treatment == '37C'), aes(y=Rate, x=Lo
   xlab("Genomic locus")
 ```
 
-- plotted are LoH rates with 95\\% confidence intervals
-- p-value = 8.227e-05
-
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_37C.txt")
 wilcox.test(WSR$X30C, WSR$X37C)
 ```
 
 
-##Genome-wide LoH rates at 30C and 39C
+##Growth at 39$^{\circ}$C significantly increases LoH rates across the genome
+
+- plotted are LoH rates with 95\% confidence intervals
+- p-value = 8.227e-05
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -130,16 +203,16 @@ ggplot(subset(Genome, Treatment == '30C' | Treatment == '39C'), aes(y=Rate, x=Lo
   xlab("Genomic locus")
 ```
 
-- plotted are LoH rates with 95\\% confidence intervals
-- p-value = 8.227e-05
-
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_39C.txt")
 wilcox.test(WSR$X30C, WSR$X39C)
 ```
 
 
-##Comparison of genome-wide LoH rates at 37C and 39C
+##LoH rates at 37$^{\circ}$C and 39$^{\circ}$C do not significantly differ from each other
+
+- plotted are LoH rates with 95\% confidence intervals
+- p-value = 0.3865
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -157,16 +230,15 @@ ggplot(subset(Genome, Treatment == '37C' | Treatment == '39C'), aes(y=Rate, x=Lo
   xlab("Genomic locus")
 ```
 
-- plotted are LoH rates with 95\\% confidence intervals
-- p-value = 0.3865
-
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_37C_39C.txt")
 wilcox.test(WSR$X37C, WSR$X39C)
 ```
 
 
-##Comparison of genome-wide LoH rates at 30C, 37C and 39C
+##Comparison of genome-wide LoH rates at 30$^{\circ}$C, 37$^{\circ}$C and 39$^{\circ}$C
+
+- plotted are LoH rates with 95\% confidence intervals
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -184,9 +256,11 @@ ggplot(subset(Genome, Treatment == '30C' | Treatment == '37C' | Treatment == '39
   xlab("Genomic locus")
 ```
 
-- plotted are LoH rates with 95\\% confidence intervals
 
-##Genome-wide LoH rates when treated with 3 µM Geldanamycin at 30C
+##Treatment with 3 µM Geldanamycin at 30$^{\circ}$C significantly increases LoH rates across the genome
+
+- plotted are LoH rates with 95\% confidence intervals
+- p-value = 0.0104
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -204,16 +278,16 @@ ggplot(subset(Genome, Treatment == '30C' | Treatment == 'Geldanamycin'), aes(y=R
   xlab("Genomic locus")
 ```
 
-- plotted are LoH rates with 95\\% confidence intervals
-- p-value = 0.0104
-
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_GdA.txt")
 wilcox.test(WSR$X30C, WSR$Geldanamycin)
 ```
 
 
-##Genome-wide LoH rates when treated with 3 µM Radicicol at 30C
+##Treatment with 3 µM Radicicol at 30$^{\circ}$C significantly increases genome-wide LoH rates
+
+- plotted are LoH rates with 95\% confidence intervals
+- p-value = 0.017
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -231,16 +305,16 @@ ggplot(subset(Genome, Treatment == '30C' | Treatment == 'Radicicol'), aes(y=Rate
   xlab("Genomic locus")
 ```
 
-- plotted are LoH rates with 95\\% confidence intervals
-- p-value = 0.017
-
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_RAD.txt")
 wilcox.test(WSR$X30C, WSR$RAD)
 ```
 
 
-##Comparison of genome-wide LoH rates when treated with 3 µM Geldanamycin or Radicicol at 30C
+##Comparison of genome-wide LoH rates when treated with 3 µM Geldanamycin or Radicicol at 30$^{\circ}$C
+
+- plotted are LoH rates with 95\% confidence intervals
+- RAD and GdA do not significantly differ from each other (p-value = 0.9296)
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -258,16 +332,16 @@ ggplot(subset(Genome, Treatment == '30C' | Treatment == 'Radicicol' | Treatment 
   xlab("Genomic locus")
 ```
 
-- plotted are LoH rates with 95\\% confidence intervals
-- p-value = 0.9296
-
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_GdA_RAD.txt")
 wilcox.test(WSR$GdA, WSR$RAD)
 ```
 
 
-##Genome-wide LoH rates in the HSP90/hsp90 heterozygous strain at 30C
+##Genetic reduction of Hsp90 levels do not affect LoH rates at 30$^{\circ}$C
+
+- plotted are LoH rates with 95\% confidence intervals
+- p-value = 0.791
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
@@ -285,17 +359,35 @@ ggplot(subset(Genome, Treatment == '30C' | Treatment == 'HSP90/hsp90'), aes(y=Ra
   xlab("Genomic locus")
 ```
 
-- plotted are LoH rates with 95\\% confidence intervals
-- p-value = 0.791
-
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 WSR <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/WSR_30C_HSP90.txt")
 wilcox.test(WSR$X30C, WSR$HSP90.hsp90)
 ```
 
-- Kangzhen next collected 24 colonies from four conditions (30C, 39C, GdA, RAD) for two strain backgrounds marking chromosomes 1 (HCM1) and chromosome 4 (AXL2)
+Kangzhen next collected 24 colonies from four conditions (30$^{\circ}$C, 39$^{\circ}$C, GdA, RAD) for two strain backgrounds marking chromosomes 1 (HCM1) and chromosome 4 (AXL2)
 
-#SNP-RFLP genotyping reveals different types of LoH events on Chr1 and Chr4
+
+##LoH rates appear to be exceptionally high on Chr4R (TUB4)
+
+```{r}
+Loci <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/Locus.txt")
+dodge <- position_dodge(width=0.6)
+Loci$Locus <- factor(Loci$Locus, levels = unique(Loci$Locus))
+ggplot(Loci, aes(y=Rate, x=Treatment, fill=Treatment)) +
+  geom_bar(stat='identity', position=dodge, width=0.6) +
+  geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.25) +
+  #ggtitle('LoH rates at the MYO1 (Chr 5L) locus in different conditions') +
+  facet_grid(. ~ Locus) +
+  pdf_theme() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  theme(legend.position='bottom') +
+  scale_fill_manual(values=brewer.pal(12, "Paired")[c(1,2,4,9,5,10)]) +
+  ylab("LoH rate/cell division") +
+  xlab("Treatment")
+```
+
+
+#Different types of LoH events on Chr1 and Chr4
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 LoHevents <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/SNP_RFLP.txt")
@@ -312,7 +404,8 @@ theme(legend.position='bottom', legend.key=element_rect(size=1, color="white"), 
   labs(fill="")
 ```
 
-- plotted are percentages of different LoH events on Chr1 (HCM1) and Chr4(AXL2)
+- plotted are percentages of LoH events on Chr1 (HCM1) and Chr4 (AXL2)
+- genotyped with Anja's SNP-RFLP primer and enzyme set
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results="hide"}
 steph <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH_Counts.txt")
@@ -326,7 +419,7 @@ z <- coeff/summary(test)$standard.errors
 p <- (1 - pnorm(abs(z), 0, 1))*2
 ```
 
-#Multi-nomial regression analyses to distingiush between chromosomal effects and effects of different Hsp90 stresses
+##Multi-nomial regression analyses to distingiush between chromosomal effects and effects of different Hsp90 stresses
 
 - The treatment effect differs between Chr1 and Chr4 (p-value=0.0019408)
 
@@ -360,7 +453,7 @@ knitr::kable(
 
 -p-values for main effects and interaction terms
 
--excluding BIR and unknown, high temperature (39C) does not have a significant effect on type of LoH event
+-excluding BIR and unknown, high temperature (39$^{\circ}$C) does not have a significant effect on type of LoH event
 
 -excluding BIR and unknown, treatment with GdA and RAD significantly alters frequency of LoH events (BIR and recomb absent on Chr4)
 
@@ -374,7 +467,9 @@ knitr::kable(
 
 ```
 
-#Fluconazole MICs on strains derived from flux assays with different Hsp90 stresses
+#How does Hsp90-stress induced LoH affect drug resistance?
+
+##Fluconazole MICs using 0 - 256 µg/ml drug on Chr1 (HCM1) marked strains
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 HCM1_MIC<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/HCM1_MIC.txt",sep="\t",header=T)
@@ -393,10 +488,11 @@ ggplot(HCM1_MIC2, aes(x=Hsp90_Stress, y=Value))+
         )
 ```
 
-- plotted are MICs and BBGs for 24 strains per category
-- strains marked on Chr1(HCM1)
+- plotted are MICs and beyond breakpoint growth (BBGs) for 24 strains per category
 
 #
+
+##Fluconazole MICs using 0 - 256 µg/ml drug on Chr4 (AXL2) marked strains
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 AXL2_MIC<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/AXL2_MIC.txt",sep="\t",header=T)
@@ -416,7 +512,9 @@ ggplot(AXL2_MIC2, aes(x=Hsp90_Stress, y=Value))+
 ```
 
 - plotted are MICs and BBGs for 24 strains per category
-- strains marked on Chr4(AXL2)
+- in both of these plots, strains with an MIC of >256 or 128 have been included in the MIC plot but not the BBG plot
+
+#
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 MIC_BBG<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/MIC_BBG.txt",sep="\t",header=T)
@@ -452,6 +550,33 @@ ggplot(MIC_BBG2, aes(x=Hsp90_Stress, y=Value))+
         )
 ```
 
+- in these two plots, resistant strains (MIC of >128) have been excluded from the analyses to show variation in the lower MIC ranges
+
+#Does the type of LoH event influence drug resistance?
+
+##Frequency chart of different types of LoH events
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+LoHevents <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/SNP_RFLP.txt")
+ggplot(LoHevents, aes(y=Percent, x=Treatment, fill=LoH.event)) +
+  geom_bar(stat='identity', width=0.6) +
+  facet_grid(~ Locus) +
+  #geom_errorbar(aes(ymax=Rate+CI, ymin=Rate-CI), position=dodge, width=0.25) +
+  #ggtitle('LoH type and rate across the genome') +
+theme(legend.position='bottom', legend.key=element_rect(size=1, color="white"), legend.key.size=unit(1, "lines")) +
+  scale_fill_manual(values=brewer.pal(12, "Set3")[c(1,11,3,5,8,10)]) +
+  guides(fill=guide_legend(nrow=2,byrow=TRUE)) +
+  ylab("Percent (%)") +
+  xlab("Condition") +
+  labs(fill="")
+```
+
+- based on the statistical analysis (see above), 39$^{\circ}$C does not have a significant effect on LoH event frequency but GdA and RAD (this could also be a problem with sampling size!)
+
+#
+
+##LoH and growth in fluconazole
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 MIC_BBG<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/Drug_Genotype_all.txt",sep="\t",header=T)
 MIC_BBG2<-gather(MIC_BBG, "Assay", "Value", -Colony, -Hsp90_Stress, -Locus, -Genotype)
@@ -470,11 +595,13 @@ ggplot(MIC_BBG2, aes(x=Hsp90_Stress, y=Value, colour=Genotype))+
         )
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-MIC_BBG<-read.table(file="~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/Drug_Genotype_small.txt",sep="\t",header=T)
-MIC_BBG2<-gather(MIC_BBG, "Assay", "Value", -Colony, -Hsp90_Stress, -Locus, -Genotype)
+- plotted the entire data set, BBG for MIC >256 calculated as entire growth
 
-ggplot(MIC_BBG2, aes(x=Hsp90_Stress, y=Value, colour=Genotype))+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+MIC_BBG_low <- subset(MIC_BBG, MIC<128)
+MIC_BBG_low2<-gather(MIC_BBG_low, "Assay", "Value", -Colony, -Hsp90_Stress, -Locus, -Genotype)
+
+ggplot(MIC_BBG_low2, aes(x=Hsp90_Stress, y=Value, colour=Genotype))+
   geom_jitter(size=2, position = position_jitter(width = .3))+
   facet_grid(Assay ~ Locus, scales="free") +
   scale_color_manual(values=brewer.pal(12, "Set3")[c(1,11,3,5,8,10)]) +
@@ -487,6 +614,77 @@ ggplot(MIC_BBG2, aes(x=Hsp90_Stress, y=Value, colour=Genotype))+
         legend.position="bottom"
         )
 ```
+
+- plotted all values with a MIC <128 with appropriate BBGs
+
+##Statistical analysis of Chromosome, Genotype, and MIC/BBG
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+MIC_BBG$Genotype<-relevel(MIC_BBG$Genotype, ref ="Gene conversion")
+MIC_BBG$Locus<-relevel(MIC_BBG$Locus, ref ="Chromosome 4")
+BBGfull <-lm(BBG ~ Hsp90_Stress * Genotype * Locus, data=MIC_BBG)
+BBGmain <-lm(BBG ~ Hsp90_Stress + Genotype + Locus, data=MIC_BBG)
+BBGcoeff <-summary(BBGfull)$coefficients
+MICfull <-lm(MIC ~ Hsp90_Stress * Genotype * Locus, data=MIC_BBG)
+MICmain <-lm(MIC ~ Hsp90_Stress + Genotype + Locus, data=MIC_BBG)
+MICcoeff <-summary(MICfull)$coefficients
+
+BBGchr1 <-lm(BBG ~ Hsp90_Stress * Genotype, data=subset(MIC_BBG, Locus =="Chromosome 1"))
+BBGchr1_coeff <-summary(BBGchr1)$coefficients
+MICchr1 <-lm(MIC ~ Hsp90_Stress * Genotype, data=subset(MIC_BBG, Locus =="Chromosome 1"))
+MICchr1_coeff <-summary(MICchr1)$coefficients
+```
+
+- When analyzing the complete data set (no exclusion of high MICs and BBGs) the interactions between factors (Chromosome, Genotype, BBG (top table)/MIC (bottom table) have a significant effect
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(
+  anova(BBGfull, BBGmain)
+)
+knitr::kable(
+  anova(MICfull, MICmain)
+)
+
+```
+
+## Comparing Chromosome 1 and Chromosome 4
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(
+  BBGcoeff
+)
+knitr::kable(
+  MICcoeff
+)
+
+```
+
+- When comparing all data no significant effects where detected
+
+## Analysing Chromosome 1 only
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(
+  BBGchr1_coeff
+)
+knitr::kable(
+  MICchr1_coeff
+)
+
+```
+
+- When analysing Chromosome 1 only, a significant effect for 39$^{\circ}$C can be detected for BBG (top, p - value = 0.0417382) and MIC (bottom, p - value = 0.0348377)
+
+\pagebreak
+
+# Hsp90 stress results in LoH events providing an advantage at subsequent growth at elevated temperatures.
+
+This is just an example of the current growth data. Plotted are maximum growth rates (µmax) for each strain when grown in the original LoH condition or at 30$^{\circ}$C, 39$^{\circ}$C or with pharmacological inhibition of Hsp90 using RAD or GdA. µmax is not affected when strains are grown in the original LoH condition (straight line). It appears, however, that strains that experienced LoH during GdA or RAD treatment, specifically those that now harbor gene conversions and BIR + recombination, grow subsequently better at 39$^{\circ}$C (blue circles).
+
+These are preliminary data based on one technical replicate. We will repeat the growth curves as per Anja's suggestions with three technical replicates.
+
+![Hsp90 levels at three different temperatures. Protein levels normalized to loading control.](../Figures/Growth\ Curves/Growth.png)
+
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 #Genome <- read.delim("~/Dropbox/! Diezmann Lab/R/LoH/DataFiles/LoH genome.txt")
